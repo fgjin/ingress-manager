@@ -6,35 +6,88 @@ import (
 	"github.com/spf13/viper"
 )
 
-// 定义结构体以映射 YAML 内容
+// // 定义结构体以映射 YAML 内容
+// type IngressYAML struct {
+// 	APIVersion string `mapstructure:"apiVersion"`
+// 	Kind       string `mapstructure:"kind"`
+// 	Metadata   struct {
+// 		Name        string            `mapstructure:"name"`
+// 		Namespace   string            `mapstructure:"namespace"`
+// 		Annotations map[string]string `mapstructure:"annotations"`
+// 	} `mapstructure:"metadata"`
+// 	Spec struct {
+// 		IngressClassName string `mapstructure:"ingressClassName"`
+// 		Rules            []struct {
+// 			Host string `mapstructure:"host"`
+// 			HTTP struct {
+// 				Paths []struct {
+// 					Path     string `mapstructure:"path"`
+// 					PathType string `mapstructure:"pathType"`
+// 					Backend  struct {
+// 						Service struct {
+// 							Name string `mapstructure:"name"`
+// 							Port struct {
+// 								Number int32 `mapstructure:"number"`
+// 							} `mapstructure:"port"`
+// 						} `mapstructure:"service"`
+// 					} `mapstructure:"backend"`
+// 				} `mapstructure:"paths"`
+// 			} `mapstructure:"http"`
+// 		} `mapstructure:"rules"`
+// 	} `mapstructure:"spec"`
+// }
+
+// 定义 Metadata 结构体
+type Metadata struct {
+	Name        string            `mapstructure:"name"`
+	Namespace   string            `mapstructure:"namespace"`
+	Annotations map[string]string `mapstructure:"annotations"`
+}
+
+// 定义 Backend 结构体
+type Backend struct {
+	Service BackendService `mapstructure:"service"`
+}
+
+type BackendService struct {
+	Name string             `mapstructure:"name"`
+	Port BackendServicePort `mapstructure:"port"`
+}
+
+type BackendServicePort struct {
+	Number int32 `mapstructure:"number"`
+}
+
+// 定义 Path 结构体
+type Path struct {
+	Path     string  `mapstructure:"path"`
+	PathType string  `mapstructure:"pathType"`
+	Backend  Backend `mapstructure:"backend"`
+}
+
+// 定义 HTTP 结构体
+type HTTP struct {
+	Paths []Path `mapstructure:"paths"`
+}
+
+// 定义 Rule 结构体
+type Rule struct {
+	Host string `mapstructure:"host"`
+	HTTP HTTP   `mapstructure:"http"`
+}
+
+// 定义 Spec 结构体
+type Spec struct {
+	IngressClassName string `mapstructure:"ingressClassName"`
+	Rules            []Rule `mapstructure:"rules"`
+}
+
+// 定义 IngressYAML 结构体
 type IngressYAML struct {
-	APIVersion string `mapstructure:"apiVersion"`
-	Kind       string `mapstructure:"kind"`
-	Metadata   struct {
-		Name        string            `mapstructure:"name"`
-		Namespace   string            `mapstructure:"namespace"`
-		Annotations map[string]string `mapstructure:"annotations"`
-	} `mapstructure:"metadata"`
-	Spec struct {
-		IngressClassName string `mapstructure:"ingressClassName"`
-		Rules            []struct {
-			Host string `mapstructure:"host"`
-			HTTP struct {
-				Paths []struct {
-					Path     string `mapstructure:"path"`
-					PathType string `mapstructure:"pathType"`
-					Backend  struct {
-						Service struct {
-							Name string `mapstructure:"name"`
-							Port struct {
-								Number int32 `mapstructure:"number"`
-							} `mapstructure:"port"`
-						} `mapstructure:"service"`
-					} `mapstructure:"backend"`
-				} `mapstructure:"paths"`
-			} `mapstructure:"http"`
-		} `mapstructure:"rules"`
-	} `mapstructure:"spec"`
+	APIVersion string   `mapstructure:"apiVersion"`
+	Kind       string   `mapstructure:"kind"`
+	Metadata   Metadata `mapstructure:"metadata"`
+	Spec       Spec     `mapstructure:"spec"`
 }
 
 func (i *IngressYAML) GetIngressClassName() string {
